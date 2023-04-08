@@ -1,4 +1,4 @@
-% rebase('layout.tpl', title='Home Page', year=year)
+% rebase('layout.tpl', title='Home Page', year=year,error=error,quest=quest,name=name,email=email)
 
 <div class="jumbotron">
     <img src="static\images\logo.png"> 
@@ -31,9 +31,10 @@
 </div>
 <h3> Ask a Question </h3>
 <form action="/myform" method="post">
-        <p><textarea rows="2" cols="50" name="QUEST" placeholder="Your question" required></textarea></p> 
-        <p><input type="text" size="50" name="NAME" placeholder="Your name" required></p>
-        <p><input type="email" size="50" name="ADRESS" placeholder="Your email" required></p>
+        <p><textarea rows="2" cols="50" name="QUEST" placeholder="Your question" >{{quest}}</textarea></p> 
+        <p><input type="text" size="50" name="NAME" placeholder="Your name" value={{name}}></input></p>
+        <p><input type="text" size="50" name="ADRESS" placeholder="Your email" value={{email}}></input></p>
+        <p>{{error}}</p>
         <p ><input class="btn btn-default" type="submit" value="Send"></p>
 </form>
    

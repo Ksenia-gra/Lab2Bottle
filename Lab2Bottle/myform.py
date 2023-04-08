@@ -1,4 +1,4 @@
-from bottle import post, request,view
+from bottle import post, request,view,template,datetime
 import re
 from datetime import date
 
@@ -7,13 +7,19 @@ from datetime import date
 def my_form():
     mail = request.forms.get('ADRESS')
     name = request.forms.get('NAME')
+    question = request.forms.get('QUEST')
     current_date = date.today()
     regex=re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
-    res=""
     match = re.match(regex, mail)
-    if match:
-        res="Thanks, {0} !The answer will be sent to the mail {1}. Access date: {2} ".format(name,mail,current_date)
+    if(question=="" or question==" "):
+        return template('index.tpl',year=datetime.now().year,error="Fill in field Your Question",quest=question,name=name,email=mail)
+    elif (name=="" or name==" "):
+        return template('index.tpl',year=datetime.now().year,error="Fill in field Your Name",quest=question,name=name,email=mail)
+    elif(mail=="" or mail==" "):
+        return template('index.tpl',year=datetime.now().year,error="Fill in field Your Email",quest=question,name=name,email=mail)
+    elif match:
+        return dict(message="Thanks, {0} !The answer will be sent to the mail {1}. Access date: {2} ".format(name,mail,current_date))
     else:
-        res="Sorry, {0}, email isn't match the format,get back and try again.Access date: {1}".format(name,current_date)
-    return dict(message=res)
+        return template('index.tpl',year=datetime.now().year,error="Email isn't match the format",quest=question,name=name,email=mail) 
+    
 
