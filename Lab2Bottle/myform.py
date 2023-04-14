@@ -1,5 +1,6 @@
 from bottle import post, request,view,template,datetime
 import re
+import pdb
 from datetime import date
 
 @post('/myform',method='post')
@@ -18,6 +19,8 @@ def my_form():
     elif(mail=="" or mail==" "):
         return template('index.tpl',year=datetime.now().year,error="Fill in field Your Email",quest=question,name=name,email=mail)
     elif match:
+        questions={mail:question}
+        pdb.set_trace()
         return dict(message="Thanks, {0} !The answer will be sent to the mail {1}. Access date: {2} ".format(name,mail,current_date))
     else:
         return template('index.tpl',year=datetime.now().year,error="Email isn't match the format",quest=question,name=name,email=mail) 
