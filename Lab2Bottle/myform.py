@@ -49,16 +49,17 @@ def my_form():
             #если почта уже есть в считанном словаре, то происходит проверка был ли задан такой вопрос,если был,
             # то добавление не происходит,если не был,то вопрос добавляется в словарь
             if mail in questions:
-                if question.lower() not in questions.get(mail):
-                    questions.get(mail).append(question.lower())
-                else:
-                    json.dump(questions, write_json)
-                    return dict(message="Sorry, {0} !This question has already been asked {1}. Access date: {2} ".format(name,mail,current_date))
+                for i in questions.get(mail):
+                    if name in i:
+                        if question.lower() not in i.get(name):
+                            i.get(name).append(question.lower())
+                        else:
+                            json.dump(questions, write_json)
+                            #вывод сообщения о том,что такой вопрос уже был задан
+                            return dict(message="Sorry, {0} !This question has already been asked {1}. Access date: {2} ".format(name,mail,current_date))
             else:
-                #если такого пользователя еще нет в словаре то в словарь добавляется его email и username
-                questions[mail]=[name]
-                #добавляется вопрос
-                questions.get(mail).append(question.lower())
+        #если такого пользователя еще нет в словаре то в словарь добавляется его email,username и вопрос
+                questions[mail]=[{name:question.lower()}]
             #запись в json
             json.dump(questions, write_json)
         #обратная связь об успешности доступа
