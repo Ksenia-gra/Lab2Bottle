@@ -3,19 +3,19 @@ import re
 import pdb
 import json
 import os
+import myform_mail
 from datetime import date
 
 @post('/myform',method='post')
 @view('myform')
+
 def my_form():
     #получение значений полей с формы
     mail = request.forms.get('ADRESS')
     name = request.forms.get('NAME')
     question = request.forms.get('QUEST')
     current_date = date.today()
-    #cоздание регулярного выражения
-    regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
-    match = re.match(regex, mail)
+    
     #проверка на пустоту поля вопроса
     if(question == "" or question == " "):
         return template('index.tpl',year=datetime.now().year,error="Fill in field Your Question",quest=question,name=name,email=mail)
@@ -32,7 +32,7 @@ def my_form():
     elif(mail == "" or mail == " "):
         return template('index.tpl',year=datetime.now().year,error="Fill in field Your Email",quest=question,name=name,email=mail)
     #проверка на соответствие почты регулярному выражению
-    elif not match:
+    elif not myform_mail.mail_match(mail):
         return template('index.tpl',year=datetime.now().year,error="Email isn't match the format",quest=question,name=name,email=mail) 
     else:
         questions={}
@@ -49,17 +49,22 @@ def my_form():
             #если почта уже есть в считанном словаре, то происходит проверка был ли задан такой вопрос,если был,
             # то добавление не происходит,если не был,то вопрос добавляется в словарь
             if mail in questions:
+                #цикл по именам во вложенном словаре 
                 for i in questions.get(mail):
+                    #проверка на наличие имени в словаре
                     if name in i:
+                        #проверка на наличие вопроса по имени
                         if question.lower() not in i.get(name):
                             i.get(name).append(question.lower())
                         else:
                             json.dump(questions, write_json)
                             #вывод сообщения о том,что такой вопрос уже был задан
-                            return dict(message="Sorry, {0} !This question has already been asked {1}. Access date: {2} ".format(name,mail,current_date))
+                            return template('index.tpl',year=datetime.now().year,error="Sorry {0},this question is exist".format(name),quest=question,name=name,email=mail)
+                    else:
+                        i[name]=[question.lower()]
             else:
         #если такого пользователя еще нет в словаре то в словарь добавляется его email,username и вопрос
-                questions[mail]=[{name:question.lower()}]
+                questions[mail]=[{name:[question.lower()]}]
             #запись в json
             json.dump(questions, write_json)
         #обратная связь об успешности доступа
